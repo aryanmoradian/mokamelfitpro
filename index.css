@@ -1,0 +1,54 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Vazir&display=swap');
+
+:root {
+  --color-gold: #F5C542;
+  --color-black: #000000;
+  --color-dark-gray: #1A1A1A;
+  --color-soft-white: #F0F0F0;
+}
+
+body {
+  font-family: 'Vazir', sans-serif;
+  background-color: var(--color-black);
+  color: var(--color-soft-white);
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+  text-align: right;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-brand { font-family: 'Vazir', sans-serif; font-weight: 900; }
+
+@keyframes gold-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.elite-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(245, 197, 66, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: gold-shimmer 3s infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-gold); }
+
+.gold-glow {
+  box-shadow: 0 0 20px rgba(245, 197, 66, 0.15);
+}
+
+/* RTL Specific input adjustments */
+input[dir="ltr"] { text-align: left; }

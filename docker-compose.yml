@@ -1,0 +1,75 @@
+
+version: '3.8'
+
+services:
+  # 1. Database (PostgreSQL)
+  db:
+    image: postgres:16-alpine
+    container_name: fitpro_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mokammel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      POSTGRES_DB: ${POSTGRES_DB:-fitpro}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fitpro-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mokammel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. NestJS Backend
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fitpro_backend
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-mokammel}:${POSTGRES_PASSWORD:-secret}@db:5432/${POSTGRES_DB:-fitpro}
+      JWT_SECRET: ${JWT_SECRET:-fitpro_super_secret_key_2025}
+      # Backend API Key for Google Gemini (SASKA)
+      API_KEY: ${API_KEY} 
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fitpro-net
+
+  # 3. React Frontend
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitpro_frontend
+    environment:
+      # Nginx handles the routing, so we point relative to the domain root
+      REACT_APP_API_URL: /api
+    networks:
+      - fitpro-net
+
+  # 4. Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: fitpro_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - fitpro-net
+
+volumes:
+  postgres_data:
+
+networks:
+  fitpro-net:
+    driver: bridge
